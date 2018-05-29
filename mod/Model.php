@@ -29,6 +29,19 @@ class Model
 	
 
 	}
+	function getPesanan($intArray){
+  $param    = implode(',',$intArray);
+  $sql			= "select * from menu where id_menu in(".$param.");";
+  $query = mysqli_query($this->mysqlia,$sql);
+
+  $data = array();
+  while ($row=$query->fetch_assoc()) {
+    $data[]=$row;
+  }
+      return json_encode($data);
+
+
+}
   
 
   public function get_all_warung($param, $param2 = "")

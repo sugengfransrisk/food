@@ -1,3 +1,4 @@
+<?php session_start();?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,13 +12,41 @@
     <title>Heroic Features - Start Bootstrap Template</title>
 
     <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="assets/heroic-features.css" rel="stylesheet">
 
   </head>
-
+  <div class="container">
+  <select class="form-control">
+    <option>FOOD</option>
+    <option>Pijat++</option>
+  
+  </select>
+  <button class="btn btn-primary" onclick="cart();" id="viewPesanan" data-toggle="modal" data-target="#exampleModalLong">Pesanan</button><br><br></div>
+  <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLongTitle">Pesanan Anda</h2>
+         </div>
+          <div class="modal-body" id="popup">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" id="btnBatalPesanan" class="btn btn-danger">Batalkan Pemesanan</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <?php
+    //print_r($_SESSION['idPesanan']);
+    ?>
   <body onload="index()">
 
    
@@ -45,8 +74,9 @@
    
 
     <!-- Bootstrap core JavaScript -->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/jquery/jquery.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
   </body>
 
@@ -59,6 +89,99 @@
 
 
 <script>
+function add_cart(idMenu){
+  //$( "#btnPesan" ).click(function() {
+        // let jumlahPesan = $('#jumlahPesan').val();
+        //var ambilVal = $(this).attr('data-isi');
+        //$("#idedit").val(ambilVal);
+
+        //let idMenu = $('#idMenu').val();
+        //$('#btnPesan').hide();
+       // $('#btn').append(button);
+        alert(idMenu);
+        $.ajax({
+          url:'mod/controller.php',
+          type:'post',
+          dataType:'json',
+          data:{idPesanan: idMenu},
+        });
+        alert('Pesanan Telah Terkirim Ke Keranjang');
+
+       // $("#cart").empty(data);
+        //$("#cart").append(data);
+
+      
+}
+function cart(){
+// let data='';
+// data = '<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">'+
+//       '<div class="modal-dialog" role="document">'+
+//         '<div class="modal-content">'+
+//           '<div class="modal-header">'+
+//             '<h2 class="modal-title" id="exampleModalLongTitle">Pesanan Anda</h2>'+
+//           '</div>'+
+//           '<div class="modal-body" id="popup">'+
+//           '</div>'+
+//           '<div class="modal-footer">'+
+//             '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>'+
+//             '<button type="button" id="btnBatalPesanan" class="btn btn-danger">Batalkan Pemesanan</button>'+
+//           '</div>'+
+//         '</div>'+
+//       '</div>'+
+//     '</div>'
+//     ;
+   // $('#view').empty(data);
+   // $('#view').append(data);
+
+    $('#viewPesanan').click(function(){
+      let popup = ''
+      $.ajax({
+        url:'mod/controller.php',
+        type:'post',
+        dataType:'json',
+        data:{act:"ambilPesanan"},
+        success :function (val) {
+          if(val.length > 0){
+            for (var i = 0; i < val.length; i++) {
+              // popup = nilai[i].pemilik;
+              popup +=
+                '<div class="panel panel-default">'+
+                  '<div class="panel-heading">'+
+                  '<h2> '+val[i].menu+'</h2>'+
+                  '<h2>Rp '+val[i].harga+'</h2>'+
+                '</div>'+
+                '</div>';
+            }
+          }else{
+            popup +=
+              '<div class="panel panel-default">'+
+                '<div class="panel-heading">'+
+                '<h2>Anda Belum Memesan</h2>'+
+              '</div>'+
+              '</div>';
+          }
+          //$('#popup').empty(popup);
+          $('#popup').append(popup);
+        },
+        error : function(){
+          alert('Proses Gagal');
+        },
+      });
+    });
+
+    $('#btnBatalPesanan').click(function(){
+
+      $.ajax({
+        url:'route.php',
+        type:'post',
+        dataType:'json',
+        data:{action:"batalPesanan"},
+      });
+      alert('Pesanan Dibatalkan');
+      location.reload();
+    });
+
+}
 function showResult() {
     obj = { "table":"str", "limit":20 };
 dbParam = JSON.stringify(obj);
@@ -122,10 +245,11 @@ xmlhttp.onreadystatechange = function() {
             txt += " <h3><a>" + myObj[x].menu + "</a></h3>";
             txt +=" <h4>"+ myObj[x].deskripsi + " </h4>"
             txt +=" <h3>Rp."+ myObj[x].harga + " </h4>"
+            txt +='<input type="hidden" class="input-text" id="idMenu" value="'+myObj[x].id_menu+'">'
 
            
           
-            txt += " </div><div class='card-footer'><a value='"+myObj[x].id+"' onclick='menu('this.value')' class='btn btn-primary'>Pesan</a> </div></div></div>"
+            txt += " </div><div class='card-footer'><a onclick='add_cart("+myObj[x].id_menu+");' id='btnPesan' class='btn btn-primary'>Pesan</a> </div></div></div>"
             }
        // txt += "</section>"
         document.getElementById("data").innerHTML = txt;

@@ -6,20 +6,44 @@
 
 /**
  * 
- */
+ */				session_start();
 				require 'model.php';
-				$action = $_GET['act'];
-				if ($_GET['act'] =="search") {
-				$param2 = $_GET['sel'];
-				$param= $_GET['cari'];
+				if (isset($_REQUEST['act'])) {
+				  $action   = $_REQUEST['act'];
+				  if ($_REQUEST['act'] =="search") {
+				$param2 = $_REQUEST['sel'];
+				$param= $_REQUEST['cari'];
 				}
+				}else{
+				  $action = "";	
+				}
+
+				
 				
 				$objwarung = new Model();
+				if (isset($_REQUEST['idPesanan'])) {
+				  $idPesanan   = $_REQUEST['idPesanan'];
+
+				}else{
+				  $idPesanan = '';
+				}
+
+				$_SESSION['idPesanan'][] = $idPesanan;
+				$intArray = array_map(function($nilai){return (int) $nilai;},$_SESSION['idPesanan']);
 				
 				
 				
 		
 				switch ($action) {
+					case 'ambilPesanan':
+				    $result = $objwarung->getPesanan($intArray);
+
+				    echo $result;
+				    break;
+
+				  case 'batalPesanan':
+				    session_destroy();
+				    break;
 
 					case 'search':
 						if ($param2 === "all") {
@@ -41,12 +65,12 @@
 						break;
 					
 				case 'menu':
-				$menu = $_GET['id'];
+				$menu = $_REQUEST['id'];
 						$result = $objwarung->get_menu($menu);
 						echo $result;
 						break;
 				}
-				
+				//var_dump($_REQUEST['idPesanan']);
 				
 
 		

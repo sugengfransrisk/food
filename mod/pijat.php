@@ -8,6 +8,11 @@
  * 
  */				session_start();
 				require 'model.php';
+				$id=isset($_REQUEST['id'])
+				? $_REQUEST['id']: '0';
+				$waktu=isset($_REQUEST['waktu'])
+				? $_REQUEST['waktu']: 'index';
+
 				if (isset($_REQUEST['act'])) {
 				  $action   = $_REQUEST['act'];
 				  if ($_REQUEST['act'] =="search") {
@@ -20,7 +25,7 @@
 
 				
 				
-				$objwarung = new Model();
+				$objpijat = new Model();
 				if (isset($_REQUEST['idPesanan'])) {
 				  $idPesanan   = $_REQUEST['idPesanan'];
 
@@ -36,31 +41,38 @@
 		
 				switch ($action) {
 					case 'ambilPesanan':
-				    $result = $objwarung->getPesanan($intArray);
+				    	$result = $objpijat->getPesanan($intArray);
 
-				    echo $result;
+				   		 echo $result;
 				    break;
-				    case 'TambahWarung':
+				    case 'pesan_pemijat':
+						$objpijat->simpan_pesan_pemijat($id,$waktu);
+					break;
+					case 'cek_jam':
+						$objpijat->cek_jam($id,$waktu);
+					break;		
+				    case 'show_cat':
+				   		 $result = $objpijat->show_cat();
+
+				   		 echo $result;
+				    
+				    break;
+				    case 'TambahPijat':
 				    $gambar = $_FILES['foto']['name'];
 				    $sourcePath = $_FILES['foto']['tmp_name'];       // Storing source path of the file in a variable
 					$targetPath = "uploads/".$_FILES['foto']['name']; // Target path where file is to be stored
 					move_uploaded_file($sourcePath,$targetPath) ;  
 					//var_dump($sourcePath);
 					
-				    $toko = $_REQUEST['toko'];
-				    $deskripsi= $_REQUEST['deskripsi'];
-				    $jarak  = $_REQUEST['jarak'];
-				    $rating = '1';
-				    $date= date('Y-m-d');
-
+				    $nama            = $_REQUEST['nama'];
+				    $service             = $_REQUEST['service'];
+				    $gen             = $_REQUEST['gender'];
 				   // $foto              = $_FILES['jarak'];
 				    
 
-				    $result = $objwarung->addwarung($toko,$deskripsi,$jarak,$date,$gambar,$rating);
+				    $result = $objpijat->addPemijat($nama,$service,$gambar,$gen);
 				    echo $result;
-
 				    break;
-
 
 				  case 'batalPesanan':
 				    session_destroy();
@@ -68,15 +80,15 @@
 
 					case 'search':
 						if ($param2 === "all") {
-					$result = $objwarung->get_all_warung($param);
+					$result = $objpijat->get_all_pijat($param);
 					echo $result;
 				} else {
 					if ($param2 ==="jarak") {
 							$param3="asc";
-							$result = $objwarung->get_warung_cat($param,$param2,$param3);
+							$result = $objpijat->get_pijat_cat($param,$param2,$param3);
 					} else {
 							$param3="desc";
-							$result = $objwarung->get_warung_cat($param,$param2,$param3);
+							$result = $objpijat->get_pijat_cat($param,$param2,$param3);
 					}
 					
 					
@@ -87,7 +99,7 @@
 					
 				case 'menu':
 				$menu = $_REQUEST['id'];
-						$result = $objwarung->get_menu($menu);
+						$result = $objpijat->get_menu($menu);
 						echo $result;
 						break;
 				}
